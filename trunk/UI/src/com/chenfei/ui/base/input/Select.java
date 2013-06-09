@@ -2,13 +2,13 @@ package com.chenfei.ui.base.input;
 
 import java.awt.Dimension;
 
-import javax.swing.JPasswordField;
+import javax.swing.JComboBox;
 
 import com.chenfei.ui.Attribute;
 import com.chenfei.ui.CSS;
 import com.chenfei.ui.UI;
 
-public class PasswordInput extends JPasswordField implements UI
+public class Select extends JComboBox implements UI
 {
     /** 默认序列化版本 */
     private static final long serialVersionUID = 1L;
@@ -17,14 +17,9 @@ public class PasswordInput extends JPasswordField implements UI
 
     private Attribute attr;
 
-    public PasswordInput()
+    public Select(Object[] options)
     {
-    }
-
-    public PasswordInput(final Attribute attr, final CSS css)
-    {
-        this.setAttribute(attr);
-        this.setCSS(css);
+        super(options);
     }
 
     @Override
@@ -37,11 +32,6 @@ public class PasswordInput extends JPasswordField implements UI
 
         this.attr = attr;
 
-        String value = this.attr.getValue();
-        if (null != value)
-        {
-            this.setValue(value);
-        }
         String title = this.attr.getTitle();
         if (null != title)
         {
@@ -71,32 +61,42 @@ public class PasswordInput extends JPasswordField implements UI
 
     /** 属性设置 Begin **/
 
-    public void setValue(final String value)
-    {
-        this.setText(value);
-    }
-
     private void setTitle(final String title)
     {
         this.setToolTipText(title);
     }
 
+    /** 设置选中某个选项
+     */
+    public void setSelected(Object selected)
+    {
+        if (null == selected)
+        {
+            return;
+        }
+        this.setSelectedItem(selected);
+    }
+
     /** 属性获取 Begin **/
 
-    public String getValue()
+    /** 获取选中项
+     */
+    public Object getSelected()
     {
-        return new String(this.getPassword());
+        return this.getSelectedItem();
     }
 
     /** CSS设置 Begin **/
 
-    public void setWidth(final int width)
+    private void setWidth(final int width)
     {
         this.setPreferredSize(new Dimension(width, this.getPreferredSize().height));
     }
 
-    public void setHeight(final int height)
+    private void setHeight(final int height)
     {
         this.setPreferredSize(new Dimension(this.getPreferredSize().width, height));
     }
+
+    /** 子节点操作 Begin **/
 }

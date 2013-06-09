@@ -7,7 +7,10 @@ import javax.swing.WindowConstants;
 
 public class Attribute
 {
-    /** Window 窗口标题 */
+    /**
+     * Window 窗口标题
+     * PasswordInput/Select title提示
+     */
     private String title;
 
     /** 程序图标 */

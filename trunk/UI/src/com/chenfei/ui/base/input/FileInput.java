@@ -20,7 +20,7 @@ public class FileInput extends Panel implements UI
     /** 默认序列化版本 */
     private static final long serialVersionUID = 1L;
 
-    private TextInput savePath = new TextInput();
+    private TextInput filePathInput = new TextInput();
 
     private JButton fileChoose = new JButton("浏览");
 
@@ -39,7 +39,7 @@ public class FileInput extends Panel implements UI
 
         this.bindListener();
 
-        this.add(this.savePath);
+        this.add(this.filePathInput);
         this.add(Box.createHorizontalStrut(5));
         this.add(this.fileChoose);
     }
@@ -94,7 +94,7 @@ public class FileInput extends Panel implements UI
 
                 if (result == JFileChooser.APPROVE_OPTION)
                 {
-                    FileInput.this.savePath.setValue(FileInput.this.fileChooser.getSelectedFile().getPath());
+                    FileInput.this.filePathInput.setValue(FileInput.this.fileChooser.getSelectedFile().getPath());
                 }
             }
         });
@@ -105,7 +105,7 @@ public class FileInput extends Panel implements UI
     /**  设置默认值 */
     public void setValue(final String value)
     {
-        this.savePath.setValue(value);
+        this.filePathInput.setValue(value);
         this.fileChooser.setCurrentDirectory(new File(value).getParentFile());
     }
 
@@ -115,24 +115,30 @@ public class FileInput extends Panel implements UI
         this.fileChooser.setFileSelectionMode(mode);
     }
 
+    /** 设置显示名称 **/
+    public void setText(final String text)
+    {
+        this.fileChoose.setText(text);
+    }
+
     /** 属性获取 Begin **/
 
     public String getValue()
     {
-        return this.savePath.getText();
+        return this.filePathInput.getText();
     }
 
     /** CSS设置 Begin **/
 
     private void setWidth(final int width)
     {
-        this.savePath.setWidth(width - 55);
-        this.fileChoose.setPreferredSize(new Dimension(50, this.fileChoose.getPreferredSize().height));
+        this.filePathInput.setWidth(width - 75);
+        this.fileChoose.setPreferredSize(new Dimension(70, this.fileChoose.getPreferredSize().height));
     }
 
     private void setHeight(final int height)
     {
-        this.savePath.setHeight(height);
+        this.filePathInput.setHeight(height);
         this.fileChoose.setPreferredSize(new Dimension(this.fileChoose.getPreferredSize().width, height));
     }
 }
