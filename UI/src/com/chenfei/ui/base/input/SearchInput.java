@@ -29,5 +29,5 @@ public abstract class SearchInput extends TextInput
         });
     }
 
-    protected abstract void search(String searchKeyword);
+    protected abstract void search(String keywords);
 }

@@ -17,7 +17,7 @@ public class ToolbarItem extends JToggleButton
     }
 
     /** 添加事件 
-     * @return */
+     */
     public ToolbarItem on(final Listener event)
     {
         super.addMouseListener(event);
