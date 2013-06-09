@@ -6,13 +6,22 @@ import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
 import com.chenfei.android.apk.downloader.bean.App;
+import com.chenfei.android.apk.downloader.ui.i18n.I18N;
 
 public class AppTableModel extends AbstractTableModel
 {
     /** 默认序列化版本 */
     private static final long serialVersionUID = 1L;
 
-    private String[] columnNames = {"图标", "名称", "package", "开发者", "当前版本", "大小", "价格"};
+    private String[]          columnNames      = {
+                                                    I18N.get("table.title.ico"),
+                                                    I18N.get("table.title.name"),
+                                                    I18N.get("table.title.package"),
+                                                    I18N.get("table.title.creator"),
+                                                    I18N.get("table.title.version"),
+                                                    I18N.get("table.title.size"),
+                                                    I18N.get("table.title.price"),
+                                                  };
 
     private List<Object[]> appInfoList = new LinkedList<Object[]>();
 

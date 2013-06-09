@@ -7,6 +7,7 @@ import javax.swing.JEditorPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
+import com.chenfei.android.apk.downloader.ui.i18n.I18N;
 import com.chenfei.ui.Browser;
 import com.chenfei.ui.function.Function;
 
@@ -14,7 +15,7 @@ public class AboutFunction extends Function implements HyperlinkListener
 {
     public AboutFunction(final URL url)
     {
-        super("关于");
+        super(I18N.get("menu.about"));
 
         this.initPanel(url);
     }

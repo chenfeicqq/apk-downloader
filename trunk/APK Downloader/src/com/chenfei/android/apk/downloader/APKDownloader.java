@@ -2,7 +2,6 @@ package com.chenfei.android.apk.downloader;
 
 import java.awt.Color;
 import java.awt.Image;
-import java.util.Date;
 import java.util.Properties;
 
 import javax.swing.ImageIcon;
@@ -12,10 +11,12 @@ import javax.swing.UIManager;
 import org.apache.log4j.Logger;
 import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
 
-import com.chenfei.android.apk.downloader.session.SessionUtil;
+import com.chenfei.android.apk.downloader.session.SessionUtils;
 import com.chenfei.android.apk.downloader.ui.AboutFunction;
 import com.chenfei.android.apk.downloader.ui.HomeFunction;
 import com.chenfei.android.apk.downloader.ui.OptionFunction;
+import com.chenfei.android.apk.downloader.ui.i18n.I18N;
+import com.chenfei.android.apk.downloader.util.DateUtils;
 import com.chenfei.ui.Attribute;
 import com.chenfei.ui.CSS;
 import com.chenfei.ui.UI;
@@ -26,31 +27,29 @@ public class APKDownloader
 {
     private static final Logger LOG = Logger.getLogger(APKDownloader.class);
 
-    private static final Properties PROPERTIES = new Properties();
-
     private static Application application;
 
     /**设置应用程序状态
      */
     public static void setStatus(final Object statusO)
     {
-        JLabel status = new JLabel(String.valueOf(statusO) + "    " + new Date());
+        String status = String.valueOf(statusO) + "    " + DateUtils.getNow(I18N.get("status.bar.date.pattern"));
 
-        application.setStatus(status);
+        application.setStatus(new JLabel(status));
     }
 
     private static String getTitle()
     {
+        Properties properties = new Properties();
         try
         {
-            PROPERTIES.load(APKDownloader.class.getResourceAsStream("/APK Downloader.properties"));
+            properties.load(APKDownloader.class.getResourceAsStream("/APK Downloader.properties"));
         }
         catch (Exception e)
         {
             LOG.error(e);
         }
-
-        return PROPERTIES.getProperty("name", "APK Downloader") + " " + PROPERTIES.getProperty("version", "");
+        return properties.getProperty("name") + " " + properties.getProperty("version");
     }
 
     public static void main(final String[] args)
@@ -62,17 +61,7 @@ public class APKDownloader
 
         try
         {
-            // 设置本属性将改变窗口边框样式定义
-            if (System.getProperty("os.name").indexOf("Windows") < 0)
-            {
-                // Linux/Mac OS
-                BeautyEyeLNFHelper.frameBorderStyle = BeautyEyeLNFHelper.FrameBorderStyle.generalNoTranslucencyShadow;
-            }
-            else
-            {
-                // Windows
-                BeautyEyeLNFHelper.frameBorderStyle = BeautyEyeLNFHelper.FrameBorderStyle.translucencySmallShadow;
-            }
+            BeautyEyeLNFHelper.frameBorderStyle = BeautyEyeLNFHelper.FrameBorderStyle.translucencySmallShadow;
 
             BeautyEyeLNFHelper.launchBeautyEyeLNF();
         }
@@ -82,6 +71,7 @@ public class APKDownloader
         }
 
         UIManager.put("RootPane.setupButtonVisible", false);
+        UIManager.put("SplitPane.oneTouchButtonSize", 10);
 
         final Image ico = new ImageIcon(APKDownloader.class.getResource("/APK Downloader.png")).getImage();
 
@@ -89,12 +79,13 @@ public class APKDownloader
             new UIBuilder().put(UI.WINDOW, new CSS().setWidth(900).setHeight(600))
                 .put(UI.STATUS_BAR, new CSS().setBackground(Color.WHITE))
                 .put(UI.WINDOW, new Attribute().setTitle(getTitle()).setIco(ico))
+                .put(UI.STATUS_BAR, new Attribute().setName(I18N.get("status.bar")))
                 .add(new HomeFunction())
                 .add(new OptionFunction())
                 .add(new AboutFunction(APKDownloader.class.getResource("/about.html")))
                 .build();
 
-        setStatus(SessionUtil.getSession().isLogged() ? "登录成功" : "登录失败");
+        setStatus(SessionUtils.getSession().isLogged() ? I18N.get("login.successful") : I18N.get("login.unsuccessful"));
 
         if (LOG.isDebugEnabled())
         {

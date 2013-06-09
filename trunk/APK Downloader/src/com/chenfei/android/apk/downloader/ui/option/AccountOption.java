@@ -4,6 +4,7 @@ import javax.swing.Box;
 
 import com.chenfei.android.apk.downloader.config.Config;
 import com.chenfei.android.apk.downloader.config.Config.AccountConfig;
+import com.chenfei.android.apk.downloader.ui.i18n.I18N;
 import com.chenfei.ui.Attribute;
 import com.chenfei.ui.CSS;
 import com.chenfei.ui.base.input.PasswordInput;
@@ -24,7 +25,7 @@ public class AccountOption extends DashedPanel
 
     public AccountOption(final AccountConfig config)
     {
-        super("帐号信息");
+        super(I18N.get("option.account"));
 
         int width = 250;
 
@@ -32,19 +33,27 @@ public class AccountOption extends DashedPanel
         this.password = new PasswordInput(new Attribute().setValue(config.getPassword()), new CSS().setWidth(width));
         this.deviceID = new TextInput(new Attribute().setValue(config.getDeviceID()), new CSS().setWidth(width));
 
-        this.password.setToolTipText("如果您开启了Google两步验证，请输入应用专用密码");
+        this.password.setToolTipText(I18N.get("option.account.password.tip"));
 
-        this.add(new Field("E-mail：", this.email));
+        this.add(new Field(I18N.get("option.account.email"), this.email));
         this.add(Box.createVerticalStrut(5));
-        this.add(new Field("密码：", this.password));
+        this.add(new Field(I18N.get("option.account.password"), this.password));
         this.add(Box.createVerticalStrut(5));
-        this.add(new Field("Device ID：", this.deviceID));
+        this.add(new Field(I18N.get("option.account.device.id"), this.deviceID));
     }
 
     public AccountConfig getConfig()
     {
-        return new Config.AccountConfig().setEmail(this.email.getValue())
+        return new Config.AccountConfig()
+            .setEmail(this.email.getValue())
             .setPassword(this.password.getValue())
             .setDeviceID(this.deviceID.getValue());
+    }
+
+    public void refresh(final AccountConfig accountConfig)
+    {
+        this.email.setValue(accountConfig.getEmail());
+        this.password.setValue(accountConfig.getPassword());
+        this.deviceID.setValue(accountConfig.getDeviceID());
     }
 }

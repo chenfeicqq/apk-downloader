@@ -7,6 +7,7 @@ import javax.swing.event.ChangeListener;
 
 import com.chenfei.android.apk.downloader.config.Config;
 import com.chenfei.android.apk.downloader.config.Config.ProxyConfig;
+import com.chenfei.android.apk.downloader.ui.i18n.I18N;
 import com.chenfei.ui.Attribute;
 import com.chenfei.ui.CSS;
 import com.chenfei.ui.base.input.NumberInput;
@@ -21,20 +22,20 @@ public class ProxyOption extends DashedPanel
 
     private JCheckBox enabled;
 
-    private TextInput hostName;
+    private TextInput host;
 
     private NumberInput port;
 
     public ProxyOption(final ProxyConfig config)
     {
-        super("代理");
+        super(I18N.get("option.proxy"));
 
         this.init(config);
 
-        this.add(new Field("启用：", this.enabled));
-        this.add(new Field("主机：", this.hostName));
+        this.add(new Field(I18N.get("option.proxy.enabled"), this.enabled));
+        this.add(new Field(I18N.get("option.proxy.host"), this.host));
         this.add(Box.createVerticalStrut(5));
-        this.add(new Field("端口：", this.port));
+        this.add(new Field(I18N.get("option.proxy.port"), this.port));
     }
 
     private void init(final ProxyConfig config)
@@ -43,7 +44,7 @@ public class ProxyOption extends DashedPanel
         this.enabled.setBorder(null);
         this.enabled.setSelected(config.isEnabled());
 
-        this.hostName = new TextInput(new Attribute().setValue(config.getHostName()), new CSS().setWidth(250));
+        this.host = new TextInput(new Attribute().setValue(config.getHost()), new CSS().setWidth(250));
 
         this.port = new NumberInput(new Attribute().setValue(config.getPort()), new CSS().setWidth(50));
 
@@ -54,7 +55,7 @@ public class ProxyOption extends DashedPanel
 
     private void update()
     {
-        this.hostName.setEnabled(this.enabled.isSelected());
+        this.host.setEnabled(this.enabled.isSelected());
         this.port.setEnabled(this.enabled.isSelected());
     }
 
@@ -72,7 +73,7 @@ public class ProxyOption extends DashedPanel
 
     public ProxyConfig getConfig()
     {
-        String hostName = this.hostName.getValue();
+        String host = this.host.getValue();
 
         int port = 0;
         if (!"".equals(this.port.getValue()))
@@ -89,6 +90,13 @@ public class ProxyOption extends DashedPanel
 
         boolean enabled = this.enabled.isSelected();
 
-        return new Config.ProxyConfig().setHostName(hostName).setPort(port).setEnabled(enabled);
+        return new Config.ProxyConfig().setHost(host).setPort(port).setEnabled(enabled);
+    }
+
+    public void refresh(final ProxyConfig proxyConfig)
+    {
+        this.enabled.setSelected(proxyConfig.isEnabled());
+        this.host.setValue(proxyConfig.getHost());
+        this.port.setValue(proxyConfig.getPort());
     }
 }

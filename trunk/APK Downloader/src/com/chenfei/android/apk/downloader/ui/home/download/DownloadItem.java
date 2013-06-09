@@ -17,8 +17,9 @@ import javax.swing.Timer;
 import org.apache.log4j.Logger;
 
 import com.chenfei.android.apk.downloader.bean.App;
-import com.chenfei.android.apk.downloader.config.ConfigUtil;
+import com.chenfei.android.apk.downloader.config.ConfigUtils;
 import com.chenfei.android.apk.downloader.session.Session.DownloadListener;
+import com.chenfei.android.apk.downloader.ui.i18n.I18N;
 import com.chenfei.ui.Listener;
 import com.chenfei.ui.base.ProgressBar;
 import com.chenfei.ui.base.panel.Panel;
@@ -58,8 +59,10 @@ public class DownloadItem extends Panel implements DownloadListener
         this.app = app;
 
         super.setLayout(null);
-        super.setMaximumSize(new Dimension(190, 40));
-        super.setMinimumSize(new Dimension(190, 40));
+        // 宽度保持和DownloadFunction一致
+        super.setPreferredSize(new Dimension(210, 40));
+        super.setMaximumSize(super.getPreferredSize());
+        super.setMinimumSize(super.getPreferredSize());
 
         this.initUI();
 
@@ -86,17 +89,17 @@ public class DownloadItem extends Panel implements DownloadListener
         this.progressBar = new ProgressBar();
         this.progressBar.setBounds(30, 0, 100, 30);
 
-        this.cancelButton = new JButton("取消");
-        this.cancelButton.setToolTipText("取消下载");
-        this.cancelButton.setBounds(131, 0, 44, 14);
+        this.cancelButton = new JButton(I18N.get("download.button.cancel"));
+        this.cancelButton.setToolTipText(I18N.get("download.button.cancel.tip"));
+        this.cancelButton.setBounds(131, 0, 59, 14);
 
-        this.retryButton = new JButton("重下");
-        this.retryButton.setToolTipText("重新下载");
-        this.retryButton.setBounds(131, 0, 44, 14);
+        this.retryButton = new JButton(I18N.get("download.button.retry"));
+        this.retryButton.setToolTipText(I18N.get("download.button.retry.tip"));
+        this.retryButton.setBounds(131, 0, 59, 14);
 
-        this.deleteButton = new JButton("删除");
-        this.deleteButton.setToolTipText("删除下载");
-        this.deleteButton.setBounds(131, 15, 44, 14);
+        this.deleteButton = new JButton(I18N.get("download.button.delete"));
+        this.deleteButton.setToolTipText(I18N.get("download.button.delete.tip"));
+        this.deleteButton.setBounds(131, 15, 59, 14);
     }
 
     private void bindListener()
@@ -112,7 +115,7 @@ public class DownloadItem extends Panel implements DownloadListener
                     if (event.getClickCount() == 2)
                     {
                         // 默认打开目录：配置的保存目录
-                        File saveDirectory = new File(ConfigUtil.getConfig().getSavePath());
+                        File saveDirectory = new File(ConfigUtils.getConfig().getSavePath());
 
                         // 下载文件不为空，打开文件所在目录
                         File appFile = DownloadItem.this.app.getFile();
@@ -152,8 +155,8 @@ public class DownloadItem extends Panel implements DownloadListener
                 // 取消下载
                 DownloadItem.this.cancel();
 
-                // 给予进度条提示
-                DownloadItem.this.setStatus("下载取消");
+                // 提示信息
+                DownloadItem.this.setStatus(I18N.get("download.status.cancelled"));
 
                 DownloadItem.this.cancel2retry();
 
@@ -245,8 +248,8 @@ public class DownloadItem extends Panel implements DownloadListener
                 // 如果下载完成
                 if (DownloadItem.this.isDone())
                 {
-                    // 给予进度条提示
-                    DownloadItem.this.setStatus("下载完成");
+                    // 提示信息
+                    DownloadItem.this.setStatus(I18N.get("download.status.successful"));
 
                     // 将取消按钮变为重试按钮
                     DownloadItem.this.cancel2retry();
@@ -268,13 +271,14 @@ public class DownloadItem extends Panel implements DownloadListener
                 {
                     DownloadItem.this.cancel();
 
-                    String message = DownloadItem.this.downloadWorder.getMessage();
-                    if (message == null)
+                    String status = DownloadItem.this.downloadWorder.getStatus();
+                    if (status == null)
                     {
-                        message = "下载失败";
+                        status = I18N.get("download.status.unsuccessful");
                     }
 
-                    DownloadItem.this.setStatus(message);
+                    // 提示信息
+                    DownloadItem.this.setStatus(status);
                     DownloadItem.this.cancel2retry();
                 }
             }

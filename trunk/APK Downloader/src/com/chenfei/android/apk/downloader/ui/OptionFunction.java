@@ -8,16 +8,18 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 
 import com.chenfei.android.apk.downloader.APKDownloader;
+import com.chenfei.android.apk.downloader.common.Callback;
 import com.chenfei.android.apk.downloader.config.Config;
 import com.chenfei.android.apk.downloader.config.Config.AccountConfig;
 import com.chenfei.android.apk.downloader.config.Config.CommonConfig;
 import com.chenfei.android.apk.downloader.config.Config.ProxyConfig;
-import com.chenfei.android.apk.downloader.config.ConfigUtil;
+import com.chenfei.android.apk.downloader.config.ConfigUtils;
+import com.chenfei.android.apk.downloader.session.SessionUtils;
 import com.chenfei.android.apk.downloader.ui.common.LoginWorker;
+import com.chenfei.android.apk.downloader.ui.i18n.I18N;
 import com.chenfei.android.apk.downloader.ui.option.AccountOption;
 import com.chenfei.android.apk.downloader.ui.option.CommonOption;
 import com.chenfei.android.apk.downloader.ui.option.ProxyOption;
-import com.chenfei.android.apk.downloader.util.ThreadUtils;
 import com.chenfei.ui.base.panel.Panel;
 import com.chenfei.ui.function.Function;
 
@@ -39,9 +41,9 @@ public class OptionFunction extends Function
 
     public OptionFunction()
     {
-        super("选项");
+        super(I18N.get("menu.option"));
 
-        this.initOption(ConfigUtil.getConfig());
+        this.initOption();
         this.initButton();
 
         this.getPanel().setLayout(new BoxLayout(this.getPanel(), BoxLayout.Y_AXIS));
@@ -51,8 +53,10 @@ public class OptionFunction extends Function
         this.add(this.buttonBar);
     }
 
-    private void initOption(final Config config)
+    private void initOption()
     {
+        final Config config = ConfigUtils.getConfig();
+
         this.accountOption = new AccountOption(config.getAccountConfig());
         this.proxyOption = new ProxyOption(config.getProxyConfig());
         this.commonOption = new CommonOption(config.getCommonConfig());
@@ -76,8 +80,8 @@ public class OptionFunction extends Function
 
     private void initButton()
     {
-        this.resetButton = new JButton("重置");
-        this.saveButton = new JButton("保存");
+        this.resetButton = new JButton(I18N.get("option.button.reset"));
+        this.saveButton = new JButton(I18N.get("option.button.save"));
 
         this.buttonBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
@@ -104,14 +108,29 @@ public class OptionFunction extends Function
             @Override
             public void mouseClicked(final MouseEvent event)
             {
+               final Config config = OptionFunction.this.getConfig();
+               final boolean needLogin = config.isNeedLogin(ConfigUtils.getConfig());
 
-                ConfigUtil.saveConfig(OptionFunction.this.getConfig());
+                ConfigUtils.saveConfig(config, new Callback<Boolean>()
+                {
+                    @Override
+                    public void callback(Boolean result)
+                    {
+                        if (result)
+                        {
+                            APKDownloader.setStatus(I18N.get("option.status.save.successful"));
 
-                APKDownloader.setStatus("已保存");
-
-                ThreadUtils.sleep(300);
-
-                new LoginWorker().execute();
+                            if (needLogin || !SessionUtils.getSession().isLogged())
+                            {
+                                new LoginWorker().execute();
+                            }
+                        }
+                        else
+                        {
+                            APKDownloader.setStatus(I18N.get("option.status.save.unsuccessful"));
+                        }
+                    }
+                });
             }
         });
 
@@ -120,12 +139,19 @@ public class OptionFunction extends Function
             @Override
             public void mouseClicked(final MouseEvent e)
             {
-                OptionFunction.this.optionBar.removeAll();
-
-                OptionFunction.this.initOption(ConfigUtil.getConfig());
-
-                APKDownloader.setStatus("已重置");
+                OptionFunction.this.refreshOption();
             }
         });
+    }
+
+    private void refreshOption()
+    {
+        Config config = ConfigUtils.getConfig();
+
+        this.accountOption.refresh(config.getAccountConfig());
+        this.proxyOption.refresh(config.getProxyConfig());
+        this.commonOption.refresh(config.getCommonConfig());
+
+        APKDownloader.setStatus(I18N.get("option.status.reset"));
     }
 }

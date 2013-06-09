@@ -5,7 +5,8 @@ import javax.swing.SwingWorker;
 import org.apache.log4j.Logger;
 
 import com.chenfei.android.apk.downloader.APKDownloader;
-import com.chenfei.android.apk.downloader.session.SessionUtil;
+import com.chenfei.android.apk.downloader.session.SessionUtils;
+import com.chenfei.android.apk.downloader.ui.i18n.I18N;
 
 public class LoginWorker extends SwingWorker<Boolean, Void>
 {
@@ -18,11 +19,11 @@ public class LoginWorker extends SwingWorker<Boolean, Void>
     protected Boolean doInBackground()
         throws Exception
     {
-        APKDownloader.setStatus("正在登录...");
+        APKDownloader.setStatus(I18N.get("login.ing"));
 
-        SessionUtil.refreshSession();
+        SessionUtils.refreshSession();
 
-        return SessionUtil.getSession().isLogged();
+        return SessionUtils.getSession().isLogged();
     }
 
     @Override
@@ -32,20 +33,20 @@ public class LoginWorker extends SwingWorker<Boolean, Void>
         {
             if (this.get())
             {
-                APKDownloader.setStatus("登录成功");
+                APKDownloader.setStatus(I18N.get("login.successful"));
 
                 this.firePropertyChange(SUCCESSFUL, false, true);
             }
             else
             {
-                APKDownloader.setStatus("登录失败");
+                APKDownloader.setStatus(I18N.get("login.unsuccessful"));
             }
         }
         catch (Exception e)
         {
             LOG.error("登录失败", e);
 
-            APKDownloader.setStatus("登录失败");
+            APKDownloader.setStatus(I18N.get("login.unsuccessful"));
         }
     }
 }
