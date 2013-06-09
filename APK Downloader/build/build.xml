@@ -61,6 +61,7 @@
 			<fileset dir="${project.path}">
 				<include name="lib/*" />
 				<include name="jre/**/*" />
+				<include name="language/*" />
 			</fileset>
 		</zip>
 		<zip destfile="${project.build.path}/${name}-${version}-Windows-ExcludeJRE.zip">
@@ -70,6 +71,7 @@
 			</fileset>
 			<fileset dir="${project.path}">
 				<include name="lib/*" />
+				<include name="language/*" />
 			</fileset>
 		</zip>
 	</target>
@@ -101,6 +103,7 @@
 				<include name="logs" />
 				<exclude name="logs/*" />
 				<include name="lib/*" />
+				<include name="language/*" />
 			</fileset>
 		</zip>
 	</target>

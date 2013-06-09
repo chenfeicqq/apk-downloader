@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 import com.chenfei.android.apk.downloader.bean.App;
 import com.chenfei.android.apk.downloader.session.Session.DownloadException;
 import com.chenfei.android.apk.downloader.session.Session.DownloadListener;
-import com.chenfei.android.apk.downloader.session.SessionUtil;
+import com.chenfei.android.apk.downloader.session.SessionUtils;
 
 public class DownloadWorker extends SwingWorker<Void, Void>
 {
@@ -20,7 +20,7 @@ public class DownloadWorker extends SwingWorker<Void, Void>
 
     private DownloadListener listener;
 
-    private String message;
+    private String status;
 
     public DownloadWorker(final App app, final DownloadListener listener)
     {
@@ -39,11 +39,11 @@ public class DownloadWorker extends SwingWorker<Void, Void>
 
         try
         {
-            SessionUtil.getSession().downloadApp(this.app, this.listener);
+            SessionUtils.getSession().downloadApp(this.app, this.listener);
         }
         catch (DownloadException e)
         {
-            this.message = e.getMessage();
+            this.status = e.getMessage();
 
             this.firePropertyChange(ERROR, false, true);
         }
@@ -51,7 +51,12 @@ public class DownloadWorker extends SwingWorker<Void, Void>
         {
             LOG.error("Download app error.", e);
 
-            this.firePropertyChange(ERROR, false, true);
+            // 部分情况下：当下载尚未开始，取消下载会抛出异常
+            // 如果下载已取消，则跳过异常处理
+            if (!this.isCancelled())
+            {
+                this.firePropertyChange(ERROR, false, true);
+            }
         }
         finally
         {
@@ -64,8 +69,8 @@ public class DownloadWorker extends SwingWorker<Void, Void>
         return null;
     }
 
-    public String getMessage()
+    public String getStatus()
     {
-        return this.message;
+        return this.status;
     }
 }

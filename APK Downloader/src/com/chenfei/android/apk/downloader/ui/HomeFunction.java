@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import com.chenfei.android.apk.downloader.bean.App;
 import com.chenfei.android.apk.downloader.ui.home.DownloadFunction;
 import com.chenfei.android.apk.downloader.ui.home.SearchFunction;
+import com.chenfei.android.apk.downloader.ui.i18n.I18N;
 import com.chenfei.ui.CSS;
 import com.chenfei.ui.base.panel.SplitPanel;
 import com.chenfei.ui.function.Function;
@@ -19,7 +20,7 @@ public class HomeFunction extends Function
 
     public HomeFunction()
     {
-        super("主页");
+        super(I18N.get("menu.home"));
         super.setHome(true);
 
         super.getPanel().setLayout(new BorderLayout());
@@ -32,6 +33,7 @@ public class HomeFunction extends Function
         this.panel.setEnabled(false);
         this.panel.setDividerLocation(865);
         this.panel.setBorder(null);
+        this.panel.setDividerSize(10);
 
         this.panel.setLeft(this.search);
         this.panel.setRight(this.download);

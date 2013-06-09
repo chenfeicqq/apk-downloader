@@ -10,6 +10,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import com.chenfei.android.apk.downloader.bean.App;
+import com.chenfei.android.apk.downloader.ui.i18n.I18N;
 import com.chenfei.ui.Browser;
 import com.chenfei.ui.Listener;
 import com.chenfei.ui.base.menu.MenuItem;
@@ -52,7 +53,7 @@ public abstract class AppTable extends JTable
 
     private void initPopupMenu()
     {
-        this.popupMenu.add(new MenuItem("下载选中 App 至本地").on(new Listener()
+        this.popupMenu.add(new MenuItem(I18N.get("table.popup.menu.download")).on(new Listener()
         {
             @Override
             public void actionPerformed(final ActionEvent e)
@@ -70,7 +71,7 @@ public abstract class AppTable extends JTable
             }
         }));
         this.popupMenu.addSeparator();
-        this.popupMenu.add(new MenuItem("在 Google Play 中查看").on(new Listener()
+        this.popupMenu.add(new MenuItem(I18N.get("table.popup.menu.view")).on(new Listener()
         {
             @Override
             public void actionPerformed(final ActionEvent event)

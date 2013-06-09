@@ -27,11 +27,10 @@ public class DownloadFunction extends ScrollPane
     {
         super();
 
-        super.setMinimumSize(new Dimension(195, super.getMinimumSize().height));
+        super.setMinimumSize(new Dimension(210, super.getMinimumSize().height));
         super.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         super.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-        this.panel.setMinimumSize(new Dimension(175, this.panel.getMinimumSize().height));
         this.panel.setLayout(new BoxLayout(this.panel, BoxLayout.Y_AXIS));
 
         super.getViewport().add(this.panel);

@@ -6,6 +6,8 @@ import java.text.NumberFormat;
 
 import javax.swing.ImageIcon;
 
+import com.chenfei.android.apk.downloader.ui.i18n.I18N;
+
 public class App
 {
     private String id;
@@ -138,7 +140,7 @@ public class App
     {
         if (null == price || "".equals(price))
         {
-            this.price = "免费";
+            this.price = I18N.get("app.price.free");
         }
         else
         {

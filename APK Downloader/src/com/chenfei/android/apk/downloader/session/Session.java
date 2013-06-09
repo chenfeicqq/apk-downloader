@@ -18,6 +18,8 @@ import org.apache.log4j.Logger;
 
 import com.chenfei.android.apk.downloader.bean.App;
 import com.chenfei.android.apk.downloader.config.Config;
+import com.chenfei.android.apk.downloader.config.ConfigUtils;
+import com.chenfei.android.apk.downloader.ui.i18n.I18N;
 import com.chenfei.android.apk.downloader.util.FileUtils;
 import com.chenfei.android.apk.downloader.util.IOUtils;
 import com.chenfei.android.apk.downloader.util.ThreadUtils;
@@ -42,34 +44,28 @@ public class Session
     /** 下载App使用的session */
     private MarketSession downloadSession = new MarketSession(true);
 
-    private Config config;
-
     private boolean logged;
 
-    public Session(final Config config)
+    protected Session(final Config config)
     {
-        this.config = config;
-
-        this.login();
+        this.login(config);
     }
 
-    private void login()
+    private void login(final Config config)
     {
         if (LOG.isDebugEnabled())
         {
             LOG.debug("Begin login.");
         }
+
+        String email = config.getEmail(), password = config.getPassword(), deviceID = config.getDeviceID();
+        Proxy proxy = config.getProxy();
+
         try
         {
-            this.session.login(this.config.getEmail(),
-                this.config.getPassword(),
-                this.config.getDeviceID(),
-                this.config.getProxy());
+            this.session.login(email, password, deviceID, proxy);
 
-            this.downloadSession.login(this.config.getEmail(),
-                this.config.getPassword(),
-                this.config.getDeviceID(),
-                this.config.getProxy());
+            this.downloadSession.login(email, password, deviceID, proxy);
 
             this.logged = true;
 
@@ -91,20 +87,31 @@ public class Session
         }
     }
 
-    public boolean refreshLocale(final Locale locale)
+    private void refreshLocale()
     {
+        // 如果Locale中的国家和语言与当前使用的一致，则不做处理
+        Locale locale = ConfigUtils.getConfig().getSearchConfig().getLocale();
+        if (null != locale)
+        {
+            String country = this.session.getContext().getUserCountry();
+            if (locale.getCountry().equalsIgnoreCase(country))
+            {
+                String language = this.session.getContext().getUserLanguage();
+                if (locale.getLanguage().equalsIgnoreCase(language))
+                {
+                    return;
+                }
+            }
+        }
+
         try
         {
             this.session.setLocale(locale);
             this.downloadSession.setLocale(locale);
-
-            return true;
         }
         catch (Exception e)
         {
             LOG.error("Set locale error.", e);
-
-            return false;
         }
     }
 
@@ -113,16 +120,18 @@ public class Session
         return this.logged;
     }
 
-    public List<App> searchApps(final Search search)
+    public List<App> searchApps()
     {
         final List<App> appList = new LinkedList<App>();
 
-        int index = 0, size = search.getEntriesCount(), flushSize = 0;
+        this.refreshLocale();
+
+        int index = 0, size = ConfigUtils.getConfig().getSearchConfig().getEntriesCount(), flushSize = 0;
         while (index < size)
         {
             AppsRequest appsRequest =
                 AppsRequest.newBuilder()
-                    .setQuery(search.getSearchKeyword())
+                    .setQuery(ConfigUtils.getConfig().getSearchConfig().getKeywords())
                     .setStartIndex(index)
                     .setEntriesCount(10)
                     .setWithExtendedInfo(true)
@@ -214,10 +223,11 @@ public class Session
     public void downloadApp(final App app, final DownloadListener listener)
         throws IOException
     {
+        String savePath = ConfigUtils.getConfig().getSavePath();
         // 如果下载目录不存在
-        if (!FileUtils.exists(this.config.getSavePath()))
+        if (!FileUtils.exists(savePath))
         {
-            throw new DownloadException("下载目录不存在");
+            throw new DownloadException(I18N.get("download.status.save.path.not.exists"));
         }
 
         InstallAsset installAsset = this.downloadSession.queryGetAssetRequest(app.getID()).getInstallAsset(0);
@@ -227,7 +237,7 @@ public class Session
         URL downloadURL = new URL(installAsset.getBlobUrl());
         HttpURLConnection downloadConn = null;
 
-        Proxy proxy = this.config.getProxy();
+        Proxy proxy = ConfigUtils.getConfig().getProxy();
         if (null == proxy)
         {
             downloadConn = (HttpURLConnection)downloadURL.openConnection();
@@ -255,9 +265,9 @@ public class Session
         InputStream input = null;
         OutputStream output = null;
 
-        File tempFile = this.getDownloadFile(app.getFileName() + ".download");
+        File tempFile = this.getDownloadFile(savePath, app.getFileName() + ".download");
         app.setFile(tempFile);
-        File saveFile = this.getDownloadFile(app.getFileName());
+        File saveFile = this.getDownloadFile(savePath, app.getFileName());
 
         try
         {
@@ -299,9 +309,8 @@ public class Session
         }
     }
 
-    private File getDownloadFile(final String fileName)
+    private File getDownloadFile(final String savePath, final String fileName)
     {
-        String savePath = this.config.getSavePath();
         if (null == savePath || "".equals(savePath))
         {
             return new File(fileName);
@@ -325,33 +334,6 @@ public class Session
         public DownloadException(final String message)
         {
             super(message);
-        }
-    }
-
-    public static class Search
-    {
-        private String searchKeyword;
-
-        private int entriesCount = 10;
-
-        public int getEntriesCount()
-        {
-            return this.entriesCount;
-        }
-
-        public void setEntriesCount(final int entriesCount)
-        {
-            this.entriesCount = entriesCount;
-        }
-
-        public String getSearchKeyword()
-        {
-            return this.searchKeyword;
-        }
-
-        public void setSearchKeyword(final String searchKeyword)
-        {
-            this.searchKeyword = searchKeyword;
         }
     }
 }

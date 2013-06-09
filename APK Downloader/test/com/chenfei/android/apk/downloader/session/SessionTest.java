@@ -31,11 +31,11 @@ public class SessionTest extends Session
     }
 
     @Override
-    public List<App> searchApps(final Search search)
+    public List<App> searchApps()
     {
         if (Math.random() * 10 > 5)
         {
-            return super.searchApps(search);
+            return super.searchApps();
         }
 
         List<App> appList = new ArrayList<App>();

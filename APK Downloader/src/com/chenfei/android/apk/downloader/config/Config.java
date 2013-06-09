@@ -3,6 +3,9 @@ package com.chenfei.android.apk.downloader.config;
 import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.util.Locale;
+
+import com.chenfei.android.apk.downloader.util.StringUtils;
 
 public final class Config implements Serializable
 {
@@ -15,6 +18,8 @@ public final class Config implements Serializable
 
     private CommonConfig commonConfig = new CommonConfig();
 
+    private SearchConfig searchConfig = new SearchConfig();
+
     public Config()
     {
 
@@ -25,6 +30,19 @@ public final class Config implements Serializable
         this.accountConfig = accountConfig;
         this.proxyConfig = proxyConfig;
         this.commonConfig = commonConfig;
+    }
+
+    public boolean isNeedLogin(Config config)
+    {
+        if (!this.getAccountConfig().equals(config.getAccountConfig()))
+        {
+            return true;
+        }
+        if (!this.getProxyConfig().equals(config.getProxyConfig()))
+        {
+            return true;
+        }
+        return false;
     }
 
     public AccountConfig getAccountConfig()
@@ -60,6 +78,17 @@ public final class Config implements Serializable
         return this;
     }
 
+    public SearchConfig getSearchConfig()
+    {
+        return searchConfig;
+    }
+
+    public Config setSearchConfig(SearchConfig searchConfig)
+    {
+        this.searchConfig = searchConfig;
+        return this;
+    }
+
     public String getEmail()
     {
         return this.accountConfig.getEmail();
@@ -85,12 +114,70 @@ public final class Config implements Serializable
         return this.proxyConfig.getProxy();
     }
 
+    public static class SearchConfig implements Serializable
+    {
+        /** 默认序列化版本 */
+        private static final long serialVersionUID = 1L;
+
+        private transient String keywords;
+
+        private Locale locale = Locale.getDefault();
+
+        private int entriesCount = 10;
+
+        public String getKeywords()
+        {
+            return this.keywords;
+        }
+
+        public SearchConfig setKeywords(String keywords)
+        {
+            this.keywords = keywords;
+            return this;
+        }
+
+        public Locale getLocale()
+        {
+            return this.locale;
+        }
+
+        public SearchConfig setLocale(Locale locale)
+        {
+            this.locale = locale;
+            return this;
+        }
+
+        public int getEntriesCount()
+        {
+            return this.entriesCount;
+        }
+
+        public SearchConfig setEntriesCount(int entriesCount)
+        {
+            this.entriesCount = entriesCount;
+            return this;
+        }
+    }
+
     public static class CommonConfig implements Serializable
     {
         /** 默认序列化版本 */
         private static final long serialVersionUID = 1L;
 
+        private String language = "zh_CN";
+
         private String savePath = System.getProperty("user.home", "");
+
+        public String getLanguage()
+        {
+            return language;
+        }
+
+        public CommonConfig setLanguage(String language)
+        {
+            this.language = language;
+            return this;
+        }
 
         public String getSavePath()
         {
@@ -147,6 +234,34 @@ public final class Config implements Serializable
             this.deviceID = deviceID;
             return this;
         }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (null == o || !(o instanceof AccountConfig))
+            {
+                return false;
+            }
+
+            AccountConfig accountConfig = (AccountConfig) o;
+
+            if (!StringUtils.isEquals(this.getEmail(), accountConfig.getEmail()))
+            {
+                return false;
+            }
+
+            if (!StringUtils.isEquals(this.getPassword(), accountConfig.getPassword()))
+            {
+                return false;
+            }
+
+            if (!StringUtils.isEquals(this.getDeviceID(), accountConfig.getDeviceID()))
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 
     public static class ProxyConfig implements Serializable
@@ -156,7 +271,7 @@ public final class Config implements Serializable
 
         private boolean enabled;
 
-        private String hostName;
+        private String host;
 
         private int port;
 
@@ -164,7 +279,7 @@ public final class Config implements Serializable
         {
             if (this.enabled)
             {
-                return new Proxy(Proxy.Type.HTTP, new InetSocketAddress(this.hostName, this.port));
+                return new Proxy(Proxy.Type.HTTP, new InetSocketAddress(this.host, this.port));
             }
             else
             {
@@ -172,14 +287,14 @@ public final class Config implements Serializable
             }
         }
 
-        public String getHostName()
+        public String getHost()
         {
-            return this.hostName;
+            return this.host;
         }
 
-        public ProxyConfig setHostName(final String hostName)
+        public ProxyConfig setHost(final String host)
         {
-            this.hostName = hostName;
+            this.host = host;
             return this;
         }
 
@@ -209,5 +324,34 @@ public final class Config implements Serializable
             this.enabled = enabled;
             return this;
         }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (null == o || !(o instanceof ProxyConfig))
+            {
+                return false;
+            }
+
+            ProxyConfig proxyConfig = (ProxyConfig) o;
+
+            if (proxyConfig.isEnabled() != this.isEnabled())
+            {
+                return false;
+            }
+
+            if (!StringUtils.isEquals(this.getHost(), proxyConfig.getHost()))
+            {
+                return false;
+            }
+
+            if (!StringUtils.isEquals(this.getPort(), proxyConfig.getPort()))
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
+
 }
