@@ -164,9 +164,26 @@ public final class Config implements Serializable
         /** 默认序列化版本 */
         private static final long serialVersionUID = 1L;
 
-        private String language = "zh_CN";
+        private String language;
 
         private String savePath = System.getProperty("user.home", "");
+
+        public static void main(String[] args)
+        {
+            System.out.println(Locale.getDefault().getCountry());
+        }
+
+        public CommonConfig()
+        {
+            if ("CN".equalsIgnoreCase(Locale.getDefault().getCountry()))
+            {
+                this.language = "zh_CN";
+            }
+            else
+            {
+                this.language = "en_US";
+            }
+        }
 
         public String getLanguage()
         {
