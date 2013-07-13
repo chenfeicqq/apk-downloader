@@ -22,6 +22,11 @@ public class StringUtils
         return null == string || 0 == string.trim().length();
     }
 
+    public static boolean isNotBlank(String string)
+    {
+        return !isBlank(string);
+    }
+
     private StringUtils()
     {
     }

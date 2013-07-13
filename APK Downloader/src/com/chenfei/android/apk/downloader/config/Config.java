@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.chenfei.android.apk.downloader.util.StringUtils;
 
@@ -119,6 +121,10 @@ public final class Config implements Serializable
         /** 默认序列化版本 */
         private static final long serialVersionUID = 1L;
 
+        private static final String REGEX = "play\\.google\\.com\\/store\\/apps\\/details\\?(?:|.*&)id=([\\w\\d\\.\\_]+)";
+
+        private static final Pattern PATTERN = Pattern.compile(REGEX, Pattern.CASE_INSENSITIVE);
+
         private transient String keywords;
 
         private Locale locale = Locale.getDefault();
@@ -127,6 +133,14 @@ public final class Config implements Serializable
 
         public String getKeywords()
         {
+            if (null != this.keywords)
+            {
+                Matcher matcher = PATTERN.matcher(this.keywords);
+                if (matcher.find())
+                {
+                    return "pname:" + matcher.group(1);
+                }
+            }
             return this.keywords;
         }
 
